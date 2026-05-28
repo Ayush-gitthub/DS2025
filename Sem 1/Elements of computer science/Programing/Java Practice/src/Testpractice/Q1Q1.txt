@@ -1,0 +1,22 @@
+2)
+In this code we are creating a new array to with elements of originial array which are larger than the threshold
+The function takes the number of arrays and threshold as parameters. In first loop it gets number of elements that are larger than the threshold.
+then it creates the array of length of no of elements greater than treshold. Then in next loop it copies the number in the new array. The new array is returned
+
+public static int[] computeAlt(int[] arr, int threshold) {
+        int count = 0;
+        List<Integer> x = new ArrayList<Integer>();
+        int i = 0;
+        while(i<arr.length)
+        {
+            if(arr[i]>threshold)
+            {
+                x.add(arr[i]);
+            }
+            i++;
+        }
+        int [] ans = x.stream
+        return  ans;
+
+    }
+

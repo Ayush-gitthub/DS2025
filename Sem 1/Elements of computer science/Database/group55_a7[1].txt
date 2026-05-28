@@ -1,0 +1,68 @@
+SELECT DISTINCT r.name
+FROM river r
+WHERE (r.sourceelevation - r.estuaryelevation) > 2000;
+
+
+
+SELECT DISTINCT c.name
+FROM country c
+JOIN geo_river gr ON c.code = gr.country
+GROUP BY c.code, c.name
+HAVING COUNT(DISTINCT gr.river) >= 20;
+
+
+
+SELECT DISTINCT c.name
+FROM country c
+JOIN borders b 
+  ON (c.code = b.country1 AND b.country2 = 'D')
+  OR (c.code = b.country2 AND b.country1 = 'D');
+
+
+
+SELECT c.name, SUM(p.population) AS total_population
+FROM country c
+JOIN province p
+    ON p.country = c.code
+GROUP BY c.code, c.name
+ORDER BY total_population DESC
+LIMIT 10;
+
+
+
+SELECT DISTINCT c.name
+FROM country c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM language l
+    WHERE l.country = c.code
+      AND l.name = 'English'
+);
+
+
+
+SELECT DISTINCT c.name
+FROM country c
+WHERE EXISTS (
+    SELECT 1
+    FROM province p
+    JOIN city cz
+         ON cz.province = p.name
+        AND cz.country = p.country
+    WHERE p.country = c.code
+    GROUP BY p.name
+    HAVING COUNT(*) >= 5
+)
+AND EXISTS (
+    SELECT 1
+    FROM province p
+    JOIN geo_river gr
+         ON gr.province = p.name
+        AND gr.country = p.country
+    WHERE p.country = c.code
+    GROUP BY p.name
+    HAVING COUNT(*) >= 2
+);
+
+
+

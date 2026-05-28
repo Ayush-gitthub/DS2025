@@ -1,0 +1,137 @@
+SELECT p.FirstName, p.LastName, f.StrongFoot
+FROM Person p
+JOIN Footballer f ON p.PNR = f.PNR
+WHERE NOT EXISTS (
+    SELECT *
+    FROM Footballmatch fm
+    WHERE (fm.Home = 'FC Bayern Muenchen'
+        OR fm.Guest = 'FC Bayern Muenchen')
+      AND NOT EXISTS (
+          SELECT *
+          FROM playsFootball pf
+          WHERE pf.PNR = f.PNR
+            AND pf.SID = fm.SID
+            AND pf.Clubname = 'FC Bayern Muenchen'
+      )
+);
+
+
+
+SELECT p.FirstName, p.LastName, 'footballer' as profession
+FROM Person p
+where exists(
+select *
+from footballer p2 where p2.pnr = p.pnr
+)
+union all
+SELECT p.FirstName, p.LastName, 'basketballer' as profession
+FROM Person p
+where exists(
+select *
+from basketballer b  where b.pnr = p.pnr
+)
+union all
+SELECT p.FirstName, p.LastName, 'tennis player' as profession
+FROM Person p
+where exists(
+select *
+from tennisplayer t where t.pnr = p.pnr
+)
+union all
+SELECT p.FirstName, p.LastName, 'commentator' as profession
+FROM Person p
+where exists(
+select *
+from commentator c where c.pnr = p.pnr
+)
+
+
+
+WITH RECURSIVE Friends(pnr, depth) AS (
+    SELECT
+        CASE
+            WHEN f.PNR1 = 2 THEN f.PNR2
+            ELSE f.PNR1
+        END AS pnr,
+        1 AS depth
+    FROM Friendship f
+    WHERE f.PNR1 = 2 OR f.PNR2 = 2
+    UNION ALL
+    SELECT
+        CASE
+            WHEN f.PNR1 = fr.pnr THEN f.PNR2
+            ELSE f.PNR1
+        END,
+        fr.depth + 1
+    FROM Friends fr
+    JOIN Friendship f
+      ON f.PNR1 = fr.pnr
+      OR f.PNR2 = fr.pnr
+    WHERE fr.depth < 2
+)
+SELECT DISTINCT p.*
+FROM Friends fr
+JOIN Person p ON p.PNR = fr.pnr
+WHERE pnr <> 2
+;
+
+
+
+
+
+create view Footballresultsss as
+select f.sid, f.home, f.guest , s.location, s.year, count(distinct hg.minute) as homegoals, count(distinct gg.minute) as guestgoals
+from footballmatch f 
+join sportsgame s on s.sid = f.sid
+left join goal hg on hg.sid = f.sid and hg.clubname = f.home
+left join goal gg on gg.sid = f.sid and gg.clubname = f.guest
+group by f.sid, f.home, f.guest, s.location, s.year
+
+
+
+
+create view TennisComment as( 
+select s.location, s.year,p1.pnr, p1.firstname, p1.lastname, t1.playinghand as PersonInfo, 'player' as type
+from tennismatch t  
+join sportsgame s on s.sid = t.sid
+join tennisplayer t1 on t1.pnr = t.player1
+join person p1 on p1.pnr = t.player1
+union 
+select s.location, s.year,p2.pnr, p2.firstname, p2.lastname, t2.playinghand as PersonInfo, 'player' as type
+from tennismatch t  
+join sportsgame s on s.sid = t.sid
+join tennisplayer t2 on t2.pnr = t.player2
+join person p2 on p2.pnr = t.player2
+union 
+select s.location, s.year,p3.pnr, p3.firstname, p3.lastname, c1.language as PersonInfo, 'commentator' as type
+from tennismatch t  
+join sportsgame s on s.sid = t.sid
+join comments c on c.sid = t.sid
+join person p3 on p3.pnr = c.pnr
+join commentator c1 on c1.pnr = p3.pnr 
+);
+
+
+
+
+select distinct
+    b.clubname, b.sid, 
+    (b.value / AVG(b.value) OVER (PARTITION BY b.clubname)) * 100
+        AS PercentOfAverage
+FROM basketballscore b;
+
+
+
+with goalcount as (
+select g.clubname, g.sid ,count(g.sid) as goal
+from goal g 
+group by g.clubname , g.sid
+)
+select distinct f.clubname, f.year, count(f2.sid) over (partition by f.clubname) as games, MAX(gc.goal)over (partition by f.clubname) as maxgoals
+from footballclub f 
+join footballmatch f2 on f2.home = f.clubname  or f2.guest = f.clubname 
+join goalcount gc on gc.sid = f2.sid and gc.clubname = f.clubname 
+
+
+
+

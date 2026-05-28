@@ -1,0 +1,116 @@
+﻿
+DB Assignment 11
+		Date: 29th January 2026 
+Vinay Aditya Thirunagari 
+Ayush Ramkaran Yadav
+
+Exercise 2 
+Exercise 2(a): 3NF Synthesis Algorithm
+Apply the synthesis algorithm 
+Given:
+• Canonical Coverage Fc
+• A ->G,
+•  AC ->B,
+•  BEF -> C,
+•  C ->F,
+•  E -> D 
+• Candidate Keys : ABEF, ACE : 
+Step 1: Create Preliminary Relations
+We create a relation Ri containing all attributes involved in those FDs.
+• R1(A, G)
+• R2(A, C, B)
+• R3(B, E, F, C)
+• R4(C, F)
+• R5(E, D)
+Step 2: Eliminate Redundant Relations (Containment)
+We check if any relation schema is a subset of another.
+• R4(C, F) subset of R3(B, E, F, C)
+• Action: Remove R4 as its attributes and dependencies are already covered by R3.
+Step 3: Ensure Candidate Key Representation
+• Action: Since no relation contains a candidate key, we must add a new relation R6 consisting of a candidate key. We will choose A, C, E : 
+Final 3NF Schema:
+1. R1(A, G)
+2. R2(A, B, C)
+3. R3(B, C, E, F)
+4. R5(D, E)
+5. R6(A, C, E)
+
+Exercise 2(b): BCNF Decomposition
+1. Derive Functional Dependencies (FDs)
+• From Entities:
+o A -> B 
+o C -> D 
+o E -> F 
+• From Relationship R1 (1:N):
+o C -> A (Because X is on the "1" side and Y is on the "N" side, each Y maps to exactly one X) 
+• From Relationship R2 (N:M):
+o AE -> G (Attribute G is attached to the N:M relationship R2, so it depends on the combined keys of X and Z) 
+Full Set of FDs: A -> B, C -> D, E -> F, C -> A, AE -> G :
+2. Determine Candidate Keys
+We find the attribute closure to determine the key for R'(A, B, C, D, E, F, G).
+• Attributes C and E do not appear on the right side of any FD.
+• Closure C, E ::
+o C, E : ->C -> A : A, C, E : ->A -> B : A, B, C, E : ->C -> D : A, B, C, D, E : ->E -> F : A, B, C, D, E, F : ->AE -> G : A, B, C, D, E, F, G :
+• Candidate Key: C, E :
+3. BCNF Decomposition Algorithm
+A relation is in BCNF iff for every FD X→Y, X is a superkey.
+• 1: C→A
+• Cis not a superkey of R^'
+• Decompose using C→A
+• Decomposition:
+• R1 (C,A)
+• R2 (C,B,D,E,F,G)
+• Check R_1 (C,A)
+• FD: C→A
+• C is the key → BCNF satisfied
+• Check R2 (C,B,D,E,F,G)
+• Relevant FDs (projected):
+• C→D
+• E→F
+• CE→G
+• C→B(via C→A→B)
+• Candidate key of R2: {C, E}
+• Violation 2: C→D
+• C is not a superkey
+• Decomposition:
+• R21 (C,D)
+• R22 (C,B,E,F,G)
+• Check R21 (C,D)
+• FD: C→D
+• Key = C→ BCNF
+• Check R22 (C,B,E,F,G)
+• FDs:
+• C→B
+• E→F
+• CE→G
+• Candidate key: {C, E}
+• Violation 3: C→B
+• Decompose:
+• R221 (C,B)
+• R222 (C,E,F,G)
+• Check R221 (C,B)
+• FD: C→B
+• Key = C→ BCNF
+• Check R_222 (C,E,F,G)
+• FDs:
+• E→F
+• CE→G
+• Candidate key: {C, E}
+• Violation 4: E→F
+• Decompose:
+• R2221 (E,F)
+• R2222 (C,E,G)
+
+Final checks
+R2221 (E,F): key = E → BCNF
+R2222 (C,E,G): FD CE→G, key = CE → BCNF
+
+Final BCNF Relations
+• R1 (C,A)
+• R2 (C,D)
+• R3 (C,B)
+• R4 (E,F)
+• R5 (C,E,G)
+
+
+

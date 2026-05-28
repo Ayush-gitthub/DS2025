@@ -1,0 +1,8 @@
+Task2 a
+For span, we used 73 bins (one per year, range 0–72) since span is integer-valued — each bin represents exactly one year, making the histogram precise and easy to interpret. For FIRST_YEAR and LAST_YEAR, we used one bin per year over the range 1950–2026, as the data is year-based and per-year granularity is natural and meaningful here.
+Task2 b
+A span of 0 means LAST_YEAR < FIRST_YEAR, which is logically impossible — an author's last publication cannot precede their first. These rows represent data errors in dblp. This manifests in the statistics as min = 0 and in the span histogram as a bar at 0. Removing these rows slightly increases the mean since these artificially low values were dragging the average down.
+
+Class 2 — Missing Values (NaN)
+
+One row each is missing FIRST_YEAR and LAST_YEAR. Without both values, a valid span cannot be computed. These rows do not meaningfully affect statistics given the dataset size of 438,321 rows, but must be removed for correctness.  
